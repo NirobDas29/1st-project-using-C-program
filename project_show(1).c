@@ -1,34 +1,25 @@
 #define _POSIX_C_SOURCE 200809L // Define before includes for POSIX functions like remove, rename
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h> // Needed for system(), exit()
-#include <ctype.h>  // For isspace
-#include <errno.h>  // For errno with file operations
-
-// --- Data Structures ---
-
-// Structure for common routine details
+#include <stdlib.h> 
+#include <ctype.h>  
+#include <errno.h>  
 struct RoutineInfo
 {
-    char day[30];      // e.g., "Sunday", "Monday-Wednesday"
-    char date[30];     // e.g., "25/12/2023", "TBA"
-    char time[30];     // e.g., "10:00 AM - 11:30 AM", "02:00 PM"
-    char room[20];     // e.g., "Room 501", "Online", "TBA"
-    char faculty[100]; // e.g., "Dr. Smith (DS)", "TBA"
+    char day[30];     
+    char date[30];   
+    char time[30];     
+    char room[20];     
+    char faculty[100]; 
 };
-
-// Structure for academic schedule (Revised Again)
 struct AcademicSchedule
 {
     char intake[20];
     char section[20];
-    char scheduleType[50];          // "Class Routine", "Mid Exam Routine", "Final Exam Routine", "Result Publication Date", "Other Event"
-    struct RoutineInfo routineData; // Use for routine types
-    char otherDetails[500];         // Use for non-routine types or extra notes
-    // int uniqueID; // Optional: Add later if needed for precise updates/deletes
+    char scheduleType[50];          
+    struct RoutineInfo routineData; 
+    char otherDetails[500];         
 };
-
-// Structure for student result (Keep as is)
 struct StudentResult
 {
     char studentID[20];
@@ -38,10 +29,6 @@ struct StudentResult
     float gpa;
     char grade[5];
 };
-
-// --- Function Prototypes ---
-
-// Admission Phase
 void handleAdmissionPhase(FILE **P_ptr);
 void searchStudentByName(FILE **P_ptr, const char *departmentName);
 void viewStudentsByIntakeSection(FILE **P_ptr, const char *departmentName);
@@ -50,51 +37,39 @@ void updateStudentById(FILE **P_ptr, const char *departmentName);
 void addStudent(FILE **P_ptr, const char *departmentName);
 void viewAllStudents(FILE **P_ptr, const char *departmentName);
 void searchStudentById(FILE **P_ptr, const char *departmentName);
-
-// Academic Schedule
 void manageAcademicSchedules(FILE **scheduleFile_ptr);
 void addSchedule(FILE **scheduleFile_ptr);
-void viewSchedule(FILE **scheduleFile_ptr); // Enhanced display
+void viewSchedule(FILE **scheduleFile_ptr); 
 void updateSchedule(FILE **scheduleFile_ptr);
 void deleteSchedule(FILE **scheduleFile_ptr);
-int isRoutineType(const char *scheduleType); // Helper
-
-// Result Management
+int isRoutineType(const char *scheduleType); 
 void manageResults(FILE **resultFile_ptr);
 void addResult(FILE **resultFile_ptr);
 void viewIndividualResult(FILE **resultFile_ptr);
 void viewResultList(FILE **resultFile_ptr);
 void updateResult(FILE **resultFile_ptr);
 void deleteResult(FILE **resultFile_ptr);
-
-// Helper Functions
 void calculateGrade(float gpa, char *grade);
 void pressEnterToContinue();
 void trimWhitespace(char *str);
 void clearInputBuffer();
-
-// --- Main Function ---
 int main()
 {
     FILE *P = NULL;
     FILE *scheduleFile = NULL;
     FILE *resultFile = NULL;
-
-    // Open student file (text mode)
-    P = fopen("test.txt", "a+"); // Append plus (read/write, create if needed, append writes)
+    P = fopen("test.txt", "a+"); 
     if (P == NULL)
     {
         perror("FATAL: Error opening student data file (test.txt)");
         return 1;
     }
-
-    // Open schedule file (binary mode)
-    scheduleFile = fopen("schedules.dat", "rb+"); // Read/write binary, must exist
+    scheduleFile = fopen("schedules.dat", "rb+"); 
     if (scheduleFile == NULL)
     {
         if (errno == ENOENT)
-        {                                                 // If file doesn't exist, create it
-            scheduleFile = fopen("schedules.dat", "wb+"); // Write/read binary, create/truncate
+        {                                       
+            scheduleFile = fopen("schedules.dat", "wb+"); 
             if (scheduleFile == NULL)
             {
                 perror("FATAL: Error creating schedule data file (schedules.dat)");
@@ -109,14 +84,12 @@ int main()
             return 1;
         }
     }
-
-    // Open result file (binary mode)
-    resultFile = fopen("results.dat", "rb+"); // Read/write binary, must exist
+    resultFile = fopen("results.dat", "rb+"); 
     if (resultFile == NULL)
     {
         if (errno == ENOENT)
-        {                                             // If file doesn't exist, create it
-            resultFile = fopen("results.dat", "wb+"); // Write/read binary, create/truncate
+        {                                           
+            resultFile = fopen("results.dat", "wb+"); 
             if (resultFile == NULL)
             {
                 perror("FATAL: Error creating result data file (results.dat)");
@@ -127,7 +100,7 @@ int main()
             }
         }
         else
-        { // Other error opening with rb+
+        { 
             perror("FATAL: Error opening result data file (results.dat)");
             fclose(P);
             if (scheduleFile)
@@ -136,22 +109,16 @@ int main()
         }
     }
 
-    // Optional: Disable buffering if experiencing output delays, especially on some systems
-    // setvbuf(stdout, NULL, _IONBF, 0);
-    // setvbuf(stderr, NULL, _IONBF, 0);
-
     int select;
     long long int pass;
     int running = 1;
 
-    system("clear || cls"); // Use || cls for Windows compatibility
+    system("clear || cls"); 
     printf("Enter Password: ");
-
-    // Use long long specifier %lld
     if (scanf("%lld", &pass) != 1)
     {
         printf("Invalid password input format.\n");
-        clearInputBuffer(); // Clear the invalid input
+        clearInputBuffer(); 
         if (P)
             fclose(P);
         if (scheduleFile)
@@ -160,7 +127,7 @@ int main()
             fclose(resultFile);
         return 1;
     }
-    clearInputBuffer(); // IMPORTANT: Clear buffer after scanf
+    clearInputBuffer(); 
 
     if (pass == 5455778081)
     {
@@ -177,48 +144,46 @@ int main()
             if (scanf("%d", &select) != 1)
             {
                 printf("Invalid input. Please enter a number (1-4).\n");
-                clearInputBuffer(); // Clear the invalid input
+                clearInputBuffer(); 
                 pressEnterToContinue();
                 continue;
             }
-            clearInputBuffer(); // IMPORTANT: Clear buffer after scanf
+            clearInputBuffer();
 
             switch (select)
             {
             case 1:
-                handleAdmissionPhase(&P); // Pass address of the pointer
+                handleAdmissionPhase(&P); 
                 break;
             case 2:
-                // Ensure scheduleFile pointer is valid before passing
                 if (scheduleFile == NULL)
                 {
-                    scheduleFile = fopen("schedules.dat", "rb+"); // Try reopening
+                    scheduleFile = fopen("schedules.dat", "rb+"); 
                     if (scheduleFile == NULL)
                         scheduleFile = fopen("schedules.dat", "wb+");
                     if (scheduleFile == NULL)
                     {
                         perror("ERROR: Cannot access schedule file in main loop");
                         pressEnterToContinue();
-                        continue; // Skip this menu option if file is bad
+                        continue; 
                     }
                 }
-                manageAcademicSchedules(&scheduleFile); // Pass address
+                manageAcademicSchedules(&scheduleFile); 
                 break;
             case 3:
-                // Ensure resultFile pointer is valid before passing
                 if (resultFile == NULL)
                 {
-                    resultFile = fopen("results.dat", "rb+"); // Try reopening
+                    resultFile = fopen("results.dat", "rb+"); 
                     if (resultFile == NULL)
                         resultFile = fopen("results.dat", "wb+");
                     if (resultFile == NULL)
                     {
                         perror("ERROR: Cannot access result file in main loop");
                         pressEnterToContinue();
-                        continue; // Skip this menu option if file is bad
+                        continue; 
                     }
                 }
-                manageResults(&resultFile); // Pass address
+                manageResults(&resultFile); 
                 break;
             case 4:
                 printf("Exiting program.\n");
@@ -229,15 +194,13 @@ int main()
                 pressEnterToContinue();
                 break;
             }
-        } // end while(running)
+        } 
     }
     else
     {
         printf("Wrong Password\n");
         pressEnterToContinue();
     }
-
-    // --- Close all files before exiting ---
     printf("Closing files...\n");
     if (P != NULL)
     {
@@ -264,8 +227,6 @@ int main()
     printf("\nProgram terminated.\n");
     return 0;
 }
-
-// --- Helper Functions ---
 void clearInputBuffer()
 {
     int c;
@@ -276,31 +237,22 @@ void clearInputBuffer()
 void trimWhitespace(char *str)
 {
     if (str == NULL || *str == '\0')
-        return; // Handle NULL or empty string
-
-    // Remove trailing newline or space
+        return; 
     size_t len = strlen(str);
     while (len > 0 && isspace((unsigned char)str[len - 1]))
     {
         str[--len] = '\0';
     }
-
-    // If string becomes empty after trailing trim
     if (len == 0)
         return;
-
-    // Remove leading space
     char *start = str;
     while (*start && isspace((unsigned char)*start))
     {
         start++;
     }
-
-    // Shift string if leading space was removed
-    // Check if start points past the original end (can happen if all were spaces)
     if (start >= str + len)
     {
-        *str = '\0'; // String contained only whitespace
+        *str = '\0'; 
         return;
     }
 
