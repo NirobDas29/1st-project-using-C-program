@@ -313,12 +313,10 @@ void handleAdmissionPhase(FILE **P_ptr)
     if (strcmp(user, "A") == 0)
     {
         system("clear || cls");
-        // Print department info (condensed for brevity)
         printf("========================================================================================\n");
         printf("      =============== Bangladesh University of Business and Technology =============\n");
         printf("========================================================================================\n\n");
         printf(":::::::::::::::::::::::: Information of Departments ::::::::::::::::::::::::\n");
-        // ... (rest of the department info print statements) ...
         printf("   1. CSE (GPA: 9.50, Fees: 5,80,000/=)\n");
         printf("   2. BBA (GPA: 9.25, Fees: 5,70,000/=)\n");
         printf("   3. EEE (GPA: 9.00, Fees: 5,40,000/=)\n");
@@ -336,7 +334,7 @@ void handleAdmissionPhase(FILE **P_ptr)
             pressEnterToContinue();
             return;
         }
-        clearInputBuffer(); // Clear buffer after scanf
+        clearInputBuffer(); 
 
         if (deptChoice >= 1 && deptChoice <= 4)
         {
@@ -358,7 +356,7 @@ void handleAdmissionPhase(FILE **P_ptr)
                 break;
             default:
                 printf("Internal error: Invalid department choice.\n");
-                return; // Should not happen
+                return; 
             }
 
             while (departmentRunning)
@@ -383,13 +381,10 @@ void handleAdmissionPhase(FILE **P_ptr)
                     pressEnterToContinue();
                     continue;
                 }
-                clearInputBuffer(); // Clear buffer after scanf
-
-                // Ensure the student file pointer is valid before calling sub-functions
+                clearInputBuffer(); 
                 if (*P_ptr == NULL)
                 {
-                    fprintf(stderr, "ERROR: Student file pointer is NULL in handleAdmissionPhase.\n");
-                    // Attempt recovery or exit? For now, let's try to reopen.
+                    fprintf(stderr, "ERROR: Student file pointer is NULL in handleAdmissionPhase.\n")
                     *P_ptr = fopen("test.txt", "a+");
                     if (*P_ptr == NULL)
                     {
@@ -446,14 +441,8 @@ void handleAdmissionPhase(FILE **P_ptr)
     }
 }
 
-// --- Student Admission Function Implementations ---
-// NOTE: These functions interact with a TEXT file ("test.txt").
-// The parsing logic is complex and depends heavily on the exact format.
-// Consider migrating to a binary format for student data for robustness.
-
 void addStudent(FILE **P_ptr, const char *departmentName)
 {
-    // Check if file pointer is valid
     if (*P_ptr == NULL)
     {
         fprintf(stderr, "ERROR: Student file is not open in addStudent.\n");
@@ -466,13 +455,10 @@ void addStudent(FILE **P_ptr, const char *departmentName)
     {
         system("clear || cls");
         printf("\n--- Add New Student to %s ---\n", departmentName);
-        // Use descriptive variable names and clear them
         char firstName[100] = "", lastName[100] = "", fatherName[100] = "", motherName[100] = "";
         char studentID[100] = "", intake[100] = "", section[100] = "";
-        char presentAddress[200] = "", permanentAddress[200] = "";                                     // Increased size
-        char bloodGroup[20] = "", mobileNumber[20] = "", backupMobileNumber[20] = "", email[100] = ""; // Adjusted sizes
-
-        // --- Get Input using fgets and trim ---
+        char presentAddress[200] = "", permanentAddress[200] = "";                         
+        char bloodGroup[20] = "", mobileNumber[20] = "", backupMobileNumber[20] = "", email[100] = ""; 
         printf("Student First Name: ");
         if (!fgets(firstName, sizeof(firstName), stdin))
         {
@@ -584,15 +570,12 @@ void addStudent(FILE **P_ptr, const char *departmentName)
         }
         else
         {
-            // --- Write to File ---
-            // Ensure we are at the end for appending in "a+" mode
             if (fseek(*P_ptr, 0, SEEK_END) != 0)
             {
                 perror("Error seeking to end of student file before writing");
             }
             else
             {
-                // Write the data with labels
                 fprintf(*P_ptr, "Student Name: %s %s\n", firstName, lastName);
                 fprintf(*P_ptr, "Father's name: %s\n", fatherName);
                 fprintf(*P_ptr, "Mother's name: %s\n", motherName);
@@ -605,9 +588,9 @@ void addStudent(FILE **P_ptr, const char *departmentName)
                 fprintf(*P_ptr, "Blood Group: %s\n", bloodGroup);
                 fprintf(*P_ptr, "Mobile number: %s\n", mobileNumber);
                 fprintf(*P_ptr, "Backup Mobile Number: %s\n", backupMobileNumber);
-                fprintf(*P_ptr, "Email: %s\n\n", email); // Add blank line separator
+                fprintf(*P_ptr, "Email: %s\n\n", email); 
 
-                fflush(*P_ptr); // Flush the output buffer
+                fflush(*P_ptr); 
 
                 if (ferror(*P_ptr))
                 {
@@ -620,26 +603,24 @@ void addStudent(FILE **P_ptr, const char *departmentName)
                 }
             }
         }
-
-        // --- Add another? ---
         printf("\n---------- Add another student to %s? ----------\n", departmentName);
         printf("1. Yes\n2. No (Back to %s Menu)\n", departmentName);
         printf("Enter Choice: ");
         int addChoice;
         if (scanf("%d", &addChoice) != 1)
         {
-            addChoice = 2;      // Default to No on bad input
-            clearInputBuffer(); // Clear bad input
+            addChoice = 2;     
+            clearInputBuffer(); 
         }
         else
         {
-            clearInputBuffer(); // Clear trailing newline
+            clearInputBuffer();
         }
 
         if (addChoice != 1)
             addStudentLoop = 0;
     }
-    pressEnterToContinue(); // Pause before returning to department menu
+    pressEnterToContinue(); 
 }
 
 void viewAllStudents(FILE **P_ptr, const char *departmentName)
@@ -654,16 +635,14 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
     system("clear || cls");
     printf("\n\n------------------- Student List for Department: %s -------------------\n\n", departmentName);
 
-    rewind(*P_ptr); // Go to the beginning of the file
+    rewind(*P_ptr); 
     if (ferror(*P_ptr))
-    { // Check for errors after rewind
+    { 
         perror("Error rewinding student file");
         clearerr(*P_ptr);
         pressEnterToContinue();
         return;
     }
-
-    // Check if file is empty by trying to read a character
     int firstChar = fgetc(*P_ptr);
     if (firstChar == EOF)
     {
@@ -679,20 +658,16 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
     }
     else
     {
-        ungetc(firstChar, *P_ptr); // Put the character back
+        ungetc(firstChar, *P_ptr); 
 
         printf("%-25s %-15s %-15s %-10s %-10s\n", "Student Name", "Student ID", "Mobile Number", "Intake", "Section");
         printf("------------------------------------------------------------------------------\n");
-
-        // Variables to hold data for the current record being read
         char name1[100] = "", name2[100] = "", studentID[100] = "", mobileNumber[100] = "";
         char currentDept[100] = "", intake[100] = "", section[100] = "";
-        char line[512]; // Increased buffer size for reading lines
+        char line[512]; 
         char fullName[201] = "";
         int recordsFound = 0;
-        int readingRecord = 0; // Flag: are we currently inside a record block?
-
-        // Initialize potential fields for each record
+        int readingRecord = 0; 
         fullName[0] = '\0';
         studentID[0] = '\0';
         mobileNumber[0] = '\0';
@@ -709,16 +684,14 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
             trimWhitespace(trimmedLine);
 
             if (strlen(trimmedLine) == 0)
-            { // Blank line is the record separator
+            { 
                 if (readingRecord)
                 {
-                    // Process the completed record
                     if (strcmp(currentDept, departmentName) == 0)
                     {
                         printf("%-25s %-15s %-15s %-10s %-10s\n", fullName, studentID, mobileNumber, intake, section);
                         recordsFound = 1;
                     }
-                    // Reset for the next potential record
                     readingRecord = 0;
                     fullName[0] = '\0';
                     studentID[0] = '\0';
@@ -729,14 +702,9 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
                     name1[0] = '\0';
                     name2[0] = '\0';
                 }
-                continue; // Move to the next line
+                continue; 
             }
-
-            // If not a blank line, it's part of a record
-            readingRecord = 1; // Mark that we are inside a record
-
-            // Attempt to parse relevant fields from the current line
-            // Use temporary buffers for sscanf to avoid partial overwrites if parsing fails
+            readingRecord = 1; 
             char temp_s1[100], temp_s2[100];
             if (sscanf(trimmedLine, "Student Name: %99s %99s", temp_s1, temp_s2) == 2)
             {
@@ -764,10 +732,7 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
             {
                 strcpy(section, temp_s1);
             }
-            // Ignore other lines like Father's Name, Address etc. for this summary view
         }
-
-        // Process the last record if the file doesn't end with a blank line
         if (readingRecord && strcmp(currentDept, departmentName) == 0)
         {
             printf("%-25s %-15s %-15s %-10s %-10s\n", fullName, studentID, mobileNumber, intake, section);
@@ -781,7 +746,7 @@ void viewAllStudents(FILE **P_ptr, const char *departmentName)
         printf("------------------------------------------------------------------------------\n");
     }
 
-    clearerr(*P_ptr); // Clear any EOF or error flags
+    clearerr(*P_ptr); 
     pressEnterToContinue();
 }
 
@@ -821,29 +786,23 @@ void searchStudentById(FILE **P_ptr, const char *departmentName)
             perror("Error rewinding student file for search");
             clearerr(*P_ptr);
             pressEnterToContinue();
-            return; // Cannot proceed if rewind failed
+            return; 
         }
 
         int found = 0;
         char line[512];
-        // Buffers for the *found* record's details
         char name1[100] = "", name2[100] = "", father[100] = "", mother[100] = "";
         char currentID[100] = "", currentDept[100] = "", intake[100] = "", section[100] = "";
         char presentAddr[200] = "", permanentAddr[200] = "", blood[20] = "";
         char mobile[20] = "", backupMobile[20] = "", email[100] = "";
         char fullName[201] = "";
-
-        // Temporary buffers for parsing within the loop
         char temp_id[100], temp_dept[100];
-        int readingRecord = 0;        // Flag: currently processing a record block
-        char recordBuffer[2048] = ""; // Buffer to hold the current record block
-
-        // Reset loop state variables
+        int readingRecord = 0;       
+        char recordBuffer[2048] = ""; 
         recordBuffer[0] = '\0';
         readingRecord = 0;
         temp_id[0] = '\0';
-        temp_dept[0] = '\0'; // Clear temps for safety
-
+        temp_dept[0] = '\0'; 
         while (fgets(line, sizeof(line), *P_ptr))
         {
             char trimmedLine[512];
@@ -851,24 +810,20 @@ void searchStudentById(FILE **P_ptr, const char *departmentName)
             trimWhitespace(trimmedLine);
 
             if (strlen(trimmedLine) == 0)
-            { // End of record block (blank line separator)
+            { 
                 if (readingRecord)
                 {
-                    // Check if the buffered record was the match
                     if (strcmp(temp_id, searchID) == 0 && strcmp(temp_dept, departmentName) == 0)
                     {
                         found = 1;
-                        // Parse the *entire buffer* to get all details for the found record
-                        // This parsing needs to be robust
                         char *linePtr = recordBuffer;
                         char blockLine[512];
-                        // Clear fields before parsing buffer
                         name1[0] = '\0';
                         name2[0] = '\0';
                         father[0] = '\0';
                         mother[0] = '\0';
                         strcpy(currentID, temp_id);
-                        strcpy(currentDept, temp_dept); // Keep matched ID/Dept
+                        strcpy(currentDept, temp_dept); 
                         intake[0] = '\0';
                         section[0] = '\0';
                         presentAddr[0] = '\0';
@@ -879,11 +834,9 @@ void searchStudentById(FILE **P_ptr, const char *departmentName)
                         email[0] = '\0';
 
                         while (sscanf(linePtr, "%511[^\n]", blockLine) == 1)
-                        { // Read line from buffer
-                            char *nextNewline = strchr(linePtr, '\n');
-
-                            // Attempt to parse each field type from blockLine
-                            char temp_s1[200], temp_s2[100]; // Larger buffers for address
+                        { 
+                            char *nextNewline = strchr(linePtr, '\n';
+                            char temp_s1[200], temp_s2[100]; 
                             if (sscanf(blockLine, "Student Name: %99s %99s", temp_s1, temp_s2) == 2)
                             {
                                 strcpy(name1, temp_s1);
